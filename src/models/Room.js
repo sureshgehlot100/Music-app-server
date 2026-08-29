@@ -39,8 +39,9 @@ const RoomSchema = new mongoose.Schema(
     currentIndex: { type: Number, default: -1 },
     isPlaying: { type: Boolean, default: false },
     currentTime: { type: Number, default: 0 },
-    updatedAt: { type: Date, default: Date.now },
-  }
+    playheadUpdatedAt: { type: Date, default: Date.now },
+  },
+  { timestamps: false }
 );
 
 module.exports = mongoose.model("Room", RoomSchema);
