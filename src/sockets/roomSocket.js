@@ -85,13 +85,15 @@ function registerRoomSocket(io) {
           addedBy: currentUsername || "Someone",
         });
 
-        // Auto-start playback if this is the first track added
+        // Only touch the playhead when playback actually starts (first track).
+        // Adding to an already-playing queue must NOT change currentTime/
+        // updatedAt, otherwise every client re-seeks the current song.
         if (room.currentIndex === -1) {
           room.currentIndex = 0;
           room.isPlaying = true;
           room.currentTime = 0;
+          room.updatedAt = new Date();
         }
-        room.updatedAt = new Date();
         await room.save();
         await broadcastState(io, roomCode);
       } catch (err) {
@@ -110,7 +112,9 @@ function registerRoomSocket(io) {
         if (index < room.currentIndex) {
           room.currentIndex -= 1;
         } else if (index === room.currentIndex) {
+          // Removing the playing track restarts the now-current track at 0
           room.currentTime = 0;
+          room.updatedAt = new Date();
           if (room.currentIndex >= room.queue.length) {
             room.currentIndex = room.queue.length - 1;
           }
@@ -119,7 +123,6 @@ function registerRoomSocket(io) {
             room.isPlaying = false;
           }
         }
-        room.updatedAt = new Date();
         await room.save();
         await broadcastState(io, roomCode);
       } catch (err) {
