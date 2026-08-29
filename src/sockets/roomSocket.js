@@ -11,7 +11,7 @@ function serializeRoom(room) {
     currentIndex: room.currentIndex,
     isPlaying: room.isPlaying,
     currentTime: room.currentTime,
-    updatedAt: room.updatedAt,
+    updatedAt: Date.now(),
   };
 }
 
